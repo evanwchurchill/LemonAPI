@@ -24,6 +24,7 @@ This file contains the main API code
 
 2. **Helper Function**:
    - `fetch_product_data(url)`: Fetches and parses product data from a given URL.
+   - `extract_product_data(data)`: Extract nested data from raw API response
 
 3. **API Endpoints**:
    - `/products/<category>`: Retrieves product data for a specific category.

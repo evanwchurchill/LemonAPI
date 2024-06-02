@@ -16,6 +16,30 @@ URLS = {
 }
 
 
+def extract_product_data(data):
+    """
+    Extract the relevant values for each record from the records list in the nested data structure
+
+    Args:
+        data (str): The raw nested data returned from the API
+
+    Returns:
+        object: Extracted product data.
+    """
+    records = data['contents'][0]['mainContent'][0]['contents'][0]['records']
+
+    products = [
+        {
+            "displayName": record['attributes']['product.displayName'],
+            "parentCategory": record['attributes']['product.parentCategory.unifiedID'],
+            "defaultSKU": record['attributes']['product.defaultSku']
+        }
+        for record in records
+    ]
+
+    return products
+
+
 def fetch_product_data(url):
     """
     Fetches and parses product data from the given URL.
@@ -30,9 +54,7 @@ def fetch_product_data(url):
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        products = list(map(lambda record: {
-            "displayName": record['attributes']['product.displayName']
-        }, data['contents'][0]['mainContent'][0]['contents'][0]['records']))
+        products = extract_product_data(data)
         return products
     except (requests.exceptions.RequestException, KeyError) as e:
         print(f"Error fetching or parsing data: {e}")
@@ -40,7 +62,7 @@ def fetch_product_data(url):
 
 
 @app.route('/products/<category>', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=6000)
 def get_products(category):
     """
     Retrieves product data for the specified category.
@@ -59,7 +81,7 @@ def get_products(category):
 
 
 @app.route('/products/all', methods=['GET'])
-@cache.cached(timeout=60)
+@cache.cached(timeout=6000)
 def get_all_products():
     """
     Retrieves product data for all categories.

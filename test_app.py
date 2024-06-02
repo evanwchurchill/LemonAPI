@@ -1,5 +1,6 @@
 import unittest
 from app import app
+from parameterized import parameterized
 
 
 class ProductAPITestCase(unittest.TestCase):
@@ -13,21 +14,25 @@ class ProductAPITestCase(unittest.TestCase):
         """
         self.app = app.test_client()
         self.app.testing = True
+        self.FIELDS = ['displayName', 'defaultSKU', 'parentCategory']
 
-    def test_get_products(self):
+    @parameterized.expand([
+        ('leggings',),
+        ('accessories',),
+        ('all',),
+    ])
+    def test_get_products(self, category):
         """
-        Test fetching products for different categories.
+        Test fetching products for categories, and all products.
         """
-        categories = ['leggings', 'accessories']
-
-        for category in categories:
-            with self.subTest(category=category):
-                response = self.app.get(f'/products/{category}')
-                self.assertEqual(response.status_code, 200)
-                data = response.get_json()
-                self.assertIsInstance(data, list)
-                if data:
-                    self.assertIn('displayName', data[0])
+        endpoint = f'/products/{category}'
+        response = self.app.get(endpoint)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIsInstance(data, list)
+        if data:
+            for field in self.FIELDS:
+                self.assertIn(field, data[0])
 
     def test_get_products_no_category(self):
         """
