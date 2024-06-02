@@ -1,0 +1,6 @@
+Lib
+Scripts
+venv
+node_modules
+__pycache__
+.serverless
