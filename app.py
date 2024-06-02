@@ -15,6 +15,7 @@ URLS = {
     'accessories': 'https://shop.lululemon.com/c/accessories/_/N-1z0xcmkZ1z0xl44Z8ok?format=json'
 }
 
+
 def fetch_product_data(url):
     """
     Fetches and parses product data from the given URL.
@@ -37,6 +38,7 @@ def fetch_product_data(url):
         print(f"Error fetching or parsing data: {e}")
         return []
 
+
 @app.route('/products/<category>', methods=['GET'])
 @cache.cached(timeout=60)
 def get_products(category):
@@ -55,6 +57,7 @@ def get_products(category):
     products = fetch_product_data(url)
     return jsonify(products)
 
+
 @app.route('/products/all', methods=['GET'])
 @cache.cached(timeout=60)
 def get_all_products():
@@ -69,6 +72,7 @@ def get_all_products():
         products = fetch_product_data(url)
         all_products.extend(products)
     return jsonify(all_products)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
